@@ -3,7 +3,7 @@
  */
 
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logger';
 
 export async function errorHandler(
   error: FastifyError,

@@ -7,7 +7,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AccessTokensRepository } from '../db/repositories/access-tokens';
 import { ServersRepository } from '../db/repositories/servers';
 import { sessionStore } from '../infrastructure/session-store';
-import { verifyPassword } from '../utils/crypto';
+import { verifyPassword } from '../shared/utils/crypto';
 
 /**
  * セッション認証ミドルウェア

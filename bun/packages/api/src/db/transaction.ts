@@ -3,7 +3,7 @@
  */
 
 import type { Database } from 'bun:sqlite';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logger';
 import { getDatabase } from './index';
 
 /**

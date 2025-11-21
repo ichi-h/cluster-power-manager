@@ -5,7 +5,7 @@
 import { ServersRepository } from '../db/repositories/servers';
 import type { Server } from '../db/schema';
 import { CurrentStatus, HeartbeatStatus, PowerStatus } from '../db/schema';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logger';
 
 const HEARTBEAT_CHECK_INTERVAL = 10000; // 10秒
 const SYNCED_OFF_TIMEOUT = 300000; // 5分

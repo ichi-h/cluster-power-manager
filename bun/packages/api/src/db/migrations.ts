@@ -5,7 +5,7 @@
 import type { Database } from 'bun:sqlite';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logger';
 
 interface Migration {
   version: number;

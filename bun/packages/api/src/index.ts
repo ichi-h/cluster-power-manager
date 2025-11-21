@@ -4,8 +4,8 @@
 
 import { createServer } from './server';
 import { startHeartbeatMonitoring } from './services/heartbeat';
-import { getEnv } from './utils/env';
-import { logger } from './utils/logger';
+import { getEnv } from './shared/utils/env';
+import { logger } from './shared/utils/logger';
 
 const { API_PORT, API_HOST } = getEnv();
 

@@ -7,7 +7,7 @@ import type { LoginRequest } from '@komo-manager/connect/komoriuta/v1/auth_pb';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { rateLimitMiddleware } from '../middleware/rate-limit';
 import * as authService from '../services/auth';
-import { logger } from '../utils/logger';
+import { logger } from '../shared/utils/logger';
 
 export async function registerConnectRoutes(server: FastifyInstance) {
   // ========================================

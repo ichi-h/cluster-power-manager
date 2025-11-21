@@ -6,8 +6,8 @@ import { AccessTokensRepository } from '../db/repositories/access-tokens';
 import { ServersRepository } from '../db/repositories/servers';
 import type { PowerStatus, Server } from '../db/schema';
 import { withTransactionSync } from '../db/transaction';
-import { generateAccessToken, hashPassword } from '../utils/crypto';
-import { getEnv } from '../utils/env';
+import { generateAccessToken, hashPassword } from '../shared/utils/crypto';
+import { getEnv } from '../shared/utils/env';
 
 /**
  * サーバー一覧取得

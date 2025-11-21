@@ -5,8 +5,8 @@
 import { Database } from 'bun:sqlite';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { getEnv } from '../utils/env';
-import { logger } from '../utils/logger';
+import { getEnv } from '../shared/utils/env';
+import { logger } from '../shared/utils/logger';
 import { runMigrations } from './migrations';
 
 let db: Database | null = null;

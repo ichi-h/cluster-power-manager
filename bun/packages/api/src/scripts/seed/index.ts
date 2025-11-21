@@ -5,11 +5,11 @@
 import { Database } from 'bun:sqlite';
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { getEnv } from 'src/utils/env';
+import { getEnv } from 'src/shared/utils/env';
 import { runMigrations } from '../../db/migrations';
 import { AccessTokensRepository } from '../../db/repositories/access-tokens';
 import { ServersRepository } from '../../db/repositories/servers';
-import { hashPassword } from '../../utils/crypto';
+import { hashPassword } from '../../shared/utils/crypto';
 
 const { DB_PATH } = getEnv();
 

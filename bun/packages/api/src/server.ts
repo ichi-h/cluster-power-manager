@@ -8,7 +8,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { initDatabase } from './db';
 import { errorHandler } from './middleware/error';
 import { registerConnectRoutes } from './routes/connect';
-import { getEnv } from './utils/env';
+import { getEnv } from './shared/utils/env';
 
 export async function createServer(): Promise<FastifyInstance> {
   const { ALLOWED_ORIGIN, COOKIE_SECRET } = getEnv();
