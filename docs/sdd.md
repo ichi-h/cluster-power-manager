@@ -157,6 +157,15 @@ interface APILog extends BaseLog {
   durationMs: number;
 }
 
+interface AuthLog extends BaseLog {
+  type: "auth";
+  procedure: "login" | "verify" | "logout";
+  ipAddress?: string;
+  userId?: string;
+  durationMs?: number;
+  message: string;
+}
+
 interface HeartbeatWatchLog extends BaseLog {
   type: "heartbeat_watch";
   serverID: number;
@@ -184,7 +193,7 @@ interface ErrorLog extends BaseLog {
   context?: Record<string, unknown>;
 }
 
-type LogEntry = APILog | HeartbeatWatchLog | ErrorLog;
+type LogEntry = APILog | AuthLog | HeartbeatWatchLog | ErrorLog;
 ```
 
 - タイミング
