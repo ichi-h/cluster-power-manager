@@ -5,7 +5,6 @@
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AccessTokensRepository } from '../db/repositories/access-tokens';
-import { ServersRepository } from '../db/repositories/servers';
 import { sessionStore } from '../infrastructure/session-store';
 import { verifyPassword } from '../shared/utils/crypto';
 
@@ -48,17 +47,19 @@ export function extractBearerToken(
 /**
  * アクセストークンを検証してサーバーIDを返す
  */
-export async function verifyAccessToken(token: string): Promise<number | null> {
-  const tokensRepo = new AccessTokensRepository();
-  const serversRepo = new ServersRepository();
+export async function verifyAccessToken(
+  token: string,
+  tokensRepo?: AccessTokensRepository,
+): Promise<number | null> {
+  const repo = tokensRepo ?? new AccessTokensRepository();
 
-  // 全サーバーを取得
-  const servers = serversRepo.findAll();
+  // token_prefixでトークン候補を絞り込む
+  const tokenPrefix = token.substring(0, 8);
 
-  for (const server of servers) {
-    const accessToken = tokensRepo.findByServerId(server.id);
-    if (!accessToken) continue;
+  // token_prefixで絞り込んだトークンを取得
+  const candidates = repo.findByTokenPrefix(tokenPrefix);
 
+  for (const accessToken of candidates) {
     // 有効期限チェック
     if (accessToken.expires_at) {
       const expiresAt = new Date(accessToken.expires_at).getTime();
@@ -67,7 +68,7 @@ export async function verifyAccessToken(token: string): Promise<number | null> {
 
     // トークンハッシュ検証
     if (verifyPassword(token, accessToken.token_hash)) {
-      return server.id;
+      return accessToken.server_id;
     }
   }
 

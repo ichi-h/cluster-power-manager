@@ -3,7 +3,7 @@
  */
 
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { InMemoryRateLimiter } from '../rate-limiter';
+import { AgentRateLimiter, InMemoryRateLimiter } from '../rate-limiter';
 
 describe('InMemoryRateLimiter', () => {
   let limiter: InMemoryRateLimiter;
@@ -128,6 +128,115 @@ describe('InMemoryRateLimiter', () => {
       // expiredIpは削除される
       // @ts-expect-error - テストのためprivateフィールドにアクセス
       expect(limiter.attempts.has(expiredIp)).toBe(false);
+    });
+
+    test('空のストアでクリーンアップしてもエラーにならない', () => {
+      expect(() => {
+        limiter.cleanup();
+      }).not.toThrow();
+    });
+  });
+});
+
+describe('AgentRateLimiter', () => {
+  let limiter: AgentRateLimiter;
+
+  beforeEach(() => {
+    limiter = new AgentRateLimiter();
+  });
+
+  describe('recordRequest', () => {
+    test('最初のリクエストは許可される', () => {
+      const ipAddress = '192.168.1.1';
+
+      const result = limiter.recordRequest(ipAddress);
+
+      expect(result).toBe(true);
+    });
+
+    test('制限内のリクエストは許可される', () => {
+      const ipAddress = '192.168.1.1';
+
+      for (let i = 0; i < 120; i++) {
+        const result = limiter.recordRequest(ipAddress);
+        expect(result).toBe(true);
+      }
+    });
+
+    test('制限を超えたリクエストは拒否される', () => {
+      const ipAddress = '192.168.1.1';
+
+      // 120回リクエスト（制限いっぱい）
+      for (let i = 0; i < 120; i++) {
+        limiter.recordRequest(ipAddress);
+      }
+
+      // 121回目は拒否される
+      const result = limiter.recordRequest(ipAddress);
+      expect(result).toBe(false);
+    });
+
+    test('ウィンドウがリセットされたら新しくカウントが始まる', () => {
+      const ipAddress = '192.168.1.1';
+
+      // 120回リクエスト
+      for (let i = 0; i < 120; i++) {
+        limiter.recordRequest(ipAddress);
+      }
+
+      // ウィンドウをリセット（直接Mapを操作）
+      // @ts-expect-error - テストのためprivateフィールドにアクセス
+      limiter.requests.set(ipAddress, {
+        count: 120,
+        resetAt: Date.now() - 1000, // 過去の時刻
+      });
+
+      // 新しいウィンドウで許可される
+      const result = limiter.recordRequest(ipAddress);
+      expect(result).toBe(true);
+    });
+
+    test('異なるIPアドレスは独立してカウントされる', () => {
+      const ip1 = '192.168.1.1';
+      const ip2 = '192.168.1.2';
+
+      // ip1で120回リクエスト
+      for (let i = 0; i < 120; i++) {
+        limiter.recordRequest(ip1);
+      }
+
+      // ip1は拒否される
+      expect(limiter.recordRequest(ip1)).toBe(false);
+
+      // ip2は許可される
+      expect(limiter.recordRequest(ip2)).toBe(true);
+    });
+  });
+
+  describe('cleanup', () => {
+    test('期限切れエントリのみをクリーンアップする', () => {
+      const validIp = '192.168.1.1';
+      const expiredIp = '192.168.1.2';
+
+      // validIpは現在カウント中
+      limiter.recordRequest(validIp);
+
+      // expiredIpは期限切れ（直接Mapに追加）
+      // @ts-expect-error - テストのためprivateフィールドにアクセス
+      limiter.requests.set(expiredIp, {
+        count: 100,
+        resetAt: Date.now() - 1000, // 過去の時刻
+      });
+
+      limiter.cleanup();
+
+      // validIpは残る
+      // @ts-expect-error - テストのためprivateフィールドにアクセス
+      expect(limiter.requests.has(validIp)).toBe(true);
+
+      // expiredIpは削除される
+      // @ts-expect-error - テストのためprivateフィールドにアクセス
+      expect(limiter.requests.has(expiredIp)).toBe(false);
     });
 
     test('空のストアでクリーンアップしてもエラーにならない', () => {

@@ -32,17 +32,32 @@ export class AccessTokensRepository {
   }
 
   /**
+   * トークンプレフィックスでアクセストークン取得
+   */
+  findByTokenPrefix(tokenPrefix: string): AccessToken[] {
+    return this.db
+      .query('SELECT * FROM access_tokens WHERE token_prefix = ?')
+      .all(tokenPrefix) as AccessToken[];
+  }
+
+  /**
    * アクセストークン作成
    */
   create(data: {
     serverId: number;
     tokenHash: string;
+    tokenPrefix?: string | null;
     expiresAt?: string | null;
   }): number {
     const result = this.db.run(
-      `INSERT INTO access_tokens (server_id, token_hash, expires_at)
-       VALUES (?, ?, ?)`,
-      [data.serverId, data.tokenHash, data.expiresAt ?? null],
+      `INSERT INTO access_tokens (server_id, token_hash, token_prefix, expires_at)
+       VALUES (?, ?, ?, ?)`,
+      [
+        data.serverId,
+        data.tokenHash,
+        data.tokenPrefix ?? null,
+        data.expiresAt ?? null,
+      ],
     );
     return result.lastInsertRowid as number;
   }
@@ -89,6 +104,7 @@ export class AccessTokensRepository {
     serverId: number,
     data: {
       tokenHash?: string;
+      tokenPrefix?: string | null;
       expiresAt?: string | null;
     },
   ): boolean {
@@ -98,6 +114,10 @@ export class AccessTokensRepository {
     if (data.tokenHash !== undefined) {
       updates.push('token_hash = ?');
       values.push(data.tokenHash);
+    }
+    if (data.tokenPrefix !== undefined) {
+      updates.push('token_prefix = ?');
+      values.push(data.tokenPrefix);
     }
     if (data.expiresAt !== undefined) {
       updates.push('expires_at = ?');
