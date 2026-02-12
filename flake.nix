@@ -2,13 +2,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    mcp-servers-nix = {
-      url = "github:natsukium/mcp-servers-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, mcp-servers-nix }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         packages = nixpkgs.legacyPackages.${system};
@@ -20,18 +16,7 @@
               lefthook
               gh
             ];
-            shellHook = let
-              config = mcp-servers-nix.lib.mkConfig packages {
-                programs = {
-                  serena.enable = true;
-                };
-              };
-            in ''
-              if [ -L ".mcp.json" ]; then
-                unlink .mcp.json
-              fi
-              ln -sf ${config} .mcp.json
-
+            shellHook = ''
               lefthook check-install || lefthook install
             '';
           };
