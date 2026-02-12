@@ -17,10 +17,22 @@ nix develop
 direnv allow
 ```
 
-### Manager (Bun/TypeScript) - /bun
+## Protocol Buffers
 
 ```bash
-cd bun
+cd proto
+
+# .envrcが許可されていなかったら許可する
+direnv allow
+
+# スキーマからコード生成
+buf generate
+```
+
+## API (Bun/TypeScript) - /bun/packages/api
+
+```bash
+cd bun/packages/api
 
 # .envrcが許可されていなかったら許可する
 direnv allow
@@ -28,18 +40,53 @@ direnv allow
 # パッケージのインストール（Bun使用）
 bun install
 
-# 開発サーバー起動（想定）
+# 開発サーバー起動
 bun run dev
 
-# ビルド（想定）
+# ビルド（単一実行ファイル bin/komo-api を生成）
 bun run build
+
+# 実行
+bun run start
+# または
+./bin/komo-api
+
+# リンティング & フォーマット（Biome使用）
+biome check .
+biome format .
+
+# テスト実行
+bun test
+```
+
+## Web (Bun/TypeScript) - /bun/packages/web
+
+```bash
+cd bun/packages/web
+
+# .envrcが許可されていなかったら許可する
+direnv allow
+
+# パッケージのインストール（Bun使用）
+bun install
+
+# 開発サーバー起動（HMR有効）
+bun run dev
+
+# ビルド（単一実行ファイル bin/komo-web を生成、フロントエンドアセット含む）
+bun run build
+
+# 実行
+bun run start
+# または
+./bin/komo-web
 
 # リンティング & フォーマット（Biome使用）
 biome check .
 biome format .
 ```
 
-### Agent (Go) - /go
+## Agent (Go) - /go
 
 ```bash
 cd go
@@ -58,18 +105,6 @@ go vet ./...
 
 # フォーマット
 go fmt ./...
-```
-
-## Protocol Buffers
-
-```bash
-cd proto
-
-# .envrcが許可されていなかったら許可する
-direnv allow
-
-# スキーマからコード生成
-buf generate
 ```
 
 ## Git 操作
@@ -96,6 +131,23 @@ ps aux | grep komo
 systemctl status <service>
 
 # ログ確認
-tail -f /var/log/komoriuta/komo-manager.log.jsonl
+tail -f /var/log/komoriuta/komo-api.log.jsonl
+tail -f /var/log/komoriuta/komo-web.log.jsonl
 journalctl -u <service> -f
+```
+
+## Podmanコンテナ操作
+
+```bash
+# イメージビルド
+podman build -t komoriuta .
+
+# コンテナ起動
+podman run -d --name komoriuta komoriuta
+
+# コンテナ停止
+podman stop komoriuta
+
+# ログ確認
+podman logs komoriuta
 ```

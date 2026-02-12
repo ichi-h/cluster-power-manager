@@ -14,30 +14,47 @@ Komoriuta（子守唄）
 - ハートビート監視による状態管理
 
 ## アーキテクチャ
-- **Manager**: サーバー管理を行うWebアプリケーション（バックエンド + フロントエンド + プロキシ）
+- **API (komo-api)**: バックエンドAPIサーバー（Connect RPC）
+- **Web (komo-web)**: フロントエンドWebアプリケーション + 静的ファイル配信サーバー
 - **Agent**: 各サーバーに常駐するデーモン（komolet）とCLIツール（komo-agent）
 - **Database**: SQLite
 
 ## 技術スタック
 
-### Manager
+### API (komo-api)
 - 言語: TypeScript (Bun)
-- プロキシ: Bun Serve
-- バックエンド: Fastify
-- フロントエンド: React + shadcn/ui
-- コンテナ: Podman
+- フレームワーク: Fastify
 - プロトコル: Connect (Protocol Buffers)
+- 実行形式: 単一実行ファイル（bin/komo-api）
+
+### Web (komo-web)
+- 言語: TypeScript (Bun)
+- サーバー: Bun Serve（静的ファイル配信 + HMR対応）
+- フロントエンド: React
+- UIライブラリ: Tailwind CSS、将来的にshadcn/ui
+- プロトコル: Connect (Protocol Buffers)
+- 実行形式: 単一実行ファイル（bin/komo-web、フロントエンドアセット含む）
 
 ### Agent
 - 言語: Go
 - プロトコル: Connect (Protocol Buffers)
+- 実行形式:
+  - komo-agent: CLI
+  - komolet: デーモン
+
+### 共通
+- コンテナ: Podman
+- スキーマ定義: Protocol Buffers
 
 ## ディレクトリ構造
 - `/proto/`: Protocol Buffers スキーマ定義
-- `/bun/`: Manager (TypeScript/Bun) 開発環境
+- `/bun/`: Bun/TypeScript 開発環境
+  - `/bun/packages/api/`: バックエンドAPI (komo-api)
+  - `/bun/packages/web/`: フロントエンドWeb (komo-web)
+  - `/bun/packages/connect/`: Protocol Buffersから生成されたConnect用コード
 - `/go/`: Agent (Go) 開発環境
-- `/docs/`: ドキュメント（PRD, SRS, SDD）
+- `/docs/`: ドキュメント（PRD, SRS, SDD, QA）
 - `/.github/`: GitHub設定、Copilot instructions
 
 ## 開発環境
-Nixベースの開発環境。各サブディレクトリにflake.nixが存在し、必要なツールを提供。
+NixとdirenvによるNixベースの開発環境。各サブディレクトリにflake.nixが存在し、必要なツールを提供。

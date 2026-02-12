@@ -4,10 +4,28 @@
 
 ## コード品質チェック
 
-### Manager (TypeScript/Bun)
+### API (TypeScript/Bun)
 
 ```bash
-cd bun
+cd bun/packages/api
+
+# リンティング
+biome check .
+
+# フォーマット
+biome format .
+
+# テスト実行
+bun test
+
+# ビルド確認
+bun run build
+```
+
+### Web (TypeScript/Bun)
+
+```bash
+cd bun/packages/web
 
 # リンティング
 biome check .
@@ -43,6 +61,8 @@ go build
 ## Protocol Buffers
 
 ```bash
+cd proto
+
 # スキーマ変更がある場合、コード生成を実行
 buf generate
 ```
@@ -53,6 +73,9 @@ buf generate
   - `/docs/prd.md` (Product Requirements Document)
   - `/docs/srs.md` (Software Requirements Specification)
   - `/docs/sdd.md` (System Design Document)
+  - `/docs/qa.md` (QA Document)
+  - `/bun/packages/api/ARCHITECTURE.md` (API Architecture)
+  - `/bun/packages/web/ARCHITECTURE.md` (Web Architecture)
 
 ## セキュリティチェック
 
@@ -73,3 +96,10 @@ buf generate
 - [ ] データベースマイグレーション（必要な場合）
 - [ ] ログローテーション設定の確認
 - [ ] セキュリティ設定の確認（HTTPS、認証、CORS 等）
+- [ ] 単一実行ファイル（bin/komo-api, bin/komo-web）の動作確認
+
+## Serena設定・メモリの確認
+
+- プロジェクト構造に大きな変更があった場合、Serena設定とメモリを更新
+  - `.serena/memories/`
+  - `.serena/project.yaml` または `project.yml`
